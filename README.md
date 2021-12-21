@@ -8,21 +8,16 @@
 [![npm version](https://img.shields.io/npm/v/google-auth-library.svg)](https://www.npmjs.org/package/google-auth-library)
 [![codecov](https://img.shields.io/codecov/c/github/googleapis/google-auth-library-nodejs/main.svg?style=flat)](https://codecov.io/gh/googleapis/google-auth-library-nodejs)
 
+這是 Google 官方支持的 [node.js](http://nodejs.org/) 客戶端庫，用於通過 Google API 使用 OAuth 2.0 授權和身份驗證。
 
-
-
-This is Google's officially supported [node.js](http://nodejs.org/) client library for using OAuth 2.0 authorization and authentication with Google APIs.
-
-
-A comprehensive list of changes in each version may be found in
-[the CHANGELOG](https://github.com/googleapis/google-auth-library-nodejs/blob/main/CHANGELOG.md).
+每個版本的完整更改列表可以在[變更日誌](https://github.com/googleapis/google-auth-library-nodejs/blob/main/CHANGELOG.md)。
 
 * [Google Auth Library Node.js Client API Reference][client-docs]
 * [Google Auth Library Documentation][product-docs]
 * [github.com/googleapis/google-auth-library-nodejs](https://github.com/googleapis/google-auth-library-nodejs)
 
-Read more about the client libraries for Cloud APIs, including the older
-Google APIs Client Libraries, in [Client Libraries Explained][explained].
+閱讀有關 Cloud API 的客戶端庫的更多信息，包括較舊的
+Google APIs 客戶端庫，在[Client Libraries Explained][explained]中。
 
 [explained]: https://cloud.google.com/apis/docs/client-libraries-explained
 
@@ -46,44 +41,47 @@ Google APIs Client Libraries, in [Client Libraries Explained][explained].
 npm install google-auth-library
 ```
 
-## Ways to authenticate
-This library provides a variety of ways to authenticate to your Google services.
-- [Application Default Credentials](#choosing-the-correct-credential-type-automatically) - Use Application Default Credentials when you use a single identity for all users in your application. Especially useful for applications running on Google Cloud. Application Default Credentials also support workload identity federation to access Google Cloud resources from non-Google Cloud platforms.
-- [OAuth 2](#oauth2) - Use OAuth2 when you need to perform actions on behalf of the end user.
-- [JSON Web Tokens](#json-web-tokens) - Use JWT when you are using a single identity for all users. Especially useful for server->server or server->API communication.
-- [Google Compute](#compute) - Directly use a service account on Google Cloud Platform. Useful for server->server or server->API communication.
-- [Workload Identity Federation](#workload-identity-federation) - Use workload identity federation to access Google Cloud resources from Amazon Web Services (AWS), Microsoft Azure or any identity provider that supports OpenID Connect (OIDC).
-- [Impersonated Credentials Client](#impersonated-credentials-client) - access protected resources on behalf of another service account.
-- [Downscoped Client](#downscoped-client) - Use Downscoped Client with Credential Access Boundary to generate a short-lived credential with downscoped, restricted IAM permissions that can use for Cloud Storage.
+## 認證方式
+
+該庫提供了多種方式來驗證您的 Google 服務。
+
+- [Application Default Credentials](#choosing-the-correct-credential-type-automatically) - 當您對應用程序中的所有用戶使用單一身份時，使用應用程序默認憑據。對於在 Google Cloud 上運行的應用程序尤其有用。應用默認憑據還支持工作負載聯合身份驗證，以從非 GCP 平台訪問 GCP 資源。
+- [OAuth 2](#oauth2) - 當您需要代表最終用戶執行操作時使用 OAuth2。
+- [JSON Web Tokens](#json-web-tokens) - 當您為所有用戶使用單一身份時使用 JWT。特別適用於 server->server 或 server->API 通信。
+- [Google Compute](#compute) - 直接使用 Google Cloud Platform 上的服務帳戶。對 server->server 或 server->API 通信很有用。
+- [Workload Identity Federation](#workload-identity-federation) - 使用工作負載身份聯合從 Amazon Web Services (AWS)、Microsoft Azure 或任何支持 OpenID Connect (OIDC) 的身份提供商訪問 Google Cloud 資源。
+- [Impersonated Credentials Client](#impersonated-credentials-client) - 代表另一個服務帳戶訪問受保護的資源。
+- [Downscoped Client](#downscoped-client) - 使用具有憑據訪問邊界的縮小範圍客戶端生成具有縮小範圍的受限 IAM 權限的短期憑據，可用於 Cloud Storage。
 
 ## Application Default Credentials
-This library provides an implementation of [Application Default Credentials](https://cloud.google.com/docs/authentication/getting-started)for Node.js. The [Application Default Credentials](https://cloud.google.com/docs/authentication/getting-started) provide a simple way to get authorization credentials for use in calling Google APIs.
 
-They are best suited for cases when the call needs to have the same identity and authorization level for the application independent of the user. This is the recommended approach to authorize calls to Cloud APIs, particularly when you're building an application that uses Google Cloud Platform.
+此庫為 Node.js 提供了 [Application Default Credentials](https://cloud.google.com/docs/authentication/getting-started) 的實現。 [Application Default Credentials](https://cloud.google.com/docs/authentication/getting-started) 提供了一種獲取用於調用 Google API 的授權憑據的簡單方法。
 
-Application Default Credentials also support workload identity federation to access Google Cloud resources from non-Google Cloud platforms including Amazon Web Services (AWS), Microsoft Azure or any identity provider that supports OpenID Connect (OIDC). Workload identity federation is recommended for non-Google Cloud environments as it avoids the need to download, manage and store service account private keys locally, see: [Workload Identity Federation](#workload-identity-federation).
+它們最適用於調用需要對獨立於用戶的應用程序具有相同身份和授權級別的情況。 這是授權調用 Cloud API 的推薦方法，尤其是在您構建使用 Google Cloud Platform 的應用程序時。
+
+應用程序默認憑據還支持工作負載身份聯合，以從非 Google Cloud 平台（包括 Amazon Web Services (AWS)、Microsoft Azure 或任何支持 OpenID Connect (OIDC) 的身份提供商）訪問 Google Cloud 資源。 建議將工作負載身份聯合用於非 Google Cloud 環境，因為它無需在本地下載、管理和存儲服務帳號私鑰，請參閱： [Workload Identity Federation](#workload-identity-federation).
 
 #### Download your Service Account Credentials JSON file
 
-To use Application Default Credentials, You first need to download a set of JSON credentials for your project. Go to **APIs & Auth** > **Credentials** in the [Google Developers Console](https://console.cloud.google.com/) and select **Service account** from the **Add credentials** dropdown.
+要使用應用程序默認憑據，您首先需要為您的項目下載一組 JSON 憑據。 Go to **APIs & Auth** > **Credentials** in the [Google Developers Console](https://console.cloud.google.com/) and select **Service account** from the **Add credentials** dropdown.
 
-> This file is your *only copy* of these credentials. It should never be
-> committed with your source code, and should be stored securely.
+> 此文件是這些憑據的唯一副本。
+> 它不應該與您的源代碼一起提交，並且應該安全地存儲。
 
-Once downloaded, store the path to this file in the `GOOGLE_APPLICATION_CREDENTIALS` environment variable.
+下載後，將此文件的路徑存儲在`GOOGLE_APPLICATION_CREDENTIALS`環境變量中。
 
 #### Enable the API you want to use
 
-Before making your API call, you must be sure the API you're calling has been enabled. Go to **APIs & Auth** > **APIs** in the [Google Developers Console](https://console.cloud.google.com/) and enable the APIs you'd like to call. For the example below, you must enable the `DNS API`.
+在進行 API 調用之前，您必須確保您正在調用的 API 已啟用。轉到[Google Developers Console](https://console.cloud.google.com/)中的 APIs & Auth > APIs 並啟用您要調用的 API。對於下面的示例，您必須啟用`DNS API`.
 
 
 #### Choosing the correct credential type automatically
 
-Rather than manually creating an OAuth2 client, JWT client, or Compute client, the auth library can create the correct credential type for you, depending upon the environment your code is running under.
+auth 庫可以為您創建正確的憑證類型，而不是手動創建 OAuth2 客戶端、JWT 客戶端或 Compute 客戶端，具體取決於您的代碼運行的環境。
 
-For example, a JWT auth client will be created when your code is running on your local developer machine, and a Compute client will be created when the same code is running on Google Cloud Platform. If you need a specific set of scopes, you can pass those in the form of a string or an array to the `GoogleAuth` constructor.
+例如，當您的代碼在本地開發人員機器上運行時，將創建一個 JWT 身份驗證客戶端，當相同的代碼在 Google Cloud Platform 上運行時，將創建一個計算客戶端。如果您需要一組特定的範圍，您可以將它們以字符串或數組的形式傳遞給`GoogleAuth`構造函數。
 
-The code below shows how to retrieve a default credential type, depending upon the runtime environment.
+下面的代碼顯示瞭如何根據運行時環境檢索默認憑據類型。
 
 ```js
 const {GoogleAuth} = require('google-auth-library');
